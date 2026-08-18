@@ -1,0 +1,213 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---------- Design tokens — matched to verikon.vercel.app ---------- */
+:root {
+  --bg: #090A0C;
+  --fg: #FFFFFF;
+  --surface: #0F1012;
+  --surface-2: #0A0B0D;
+  --surface-3: #16181B;
+
+  --muted: #999999;
+  --muted-strong: #C7C7C7;
+  --subtle: #666666;
+  --faint: #555555;
+
+  --border: #1A1A1A;
+  --border-strong: #262626;
+
+  --accent: #FF6B35;          /* Verikon orange */
+  --accent-strong: #FF834F;
+  --accent-2: #2563EB;        /* secondary glow */
+  --on-accent: #FFFFFF;
+
+  --ring: #FF6B35;
+  --destructive: #F87171;
+  --success: #34D399;
+
+  --glow: 0 0 20px rgba(255, 107, 53, 0.6);
+  --glow-lg: 0 0 30px rgba(255, 107, 53, 0.5);
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: clamp(1.75rem, 2.4vw, 2.25rem);
+  --text-4xl: clamp(2rem, 3.2vw, 3rem);
+  --text-5xl: clamp(2.75rem, 5vw, 4.5rem);
+  --text-display: clamp(3rem, 8vw, 7.5rem);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-feature-settings: "ss01", "cv11", "kern";
+  font-variant-ligatures: common-ligatures;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--accent);
+  color: #FFFFFF;
+}
+
+:focus { outline: none; }
+:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ---------- Utilities ---------- */
+.container-px { @apply px-6 md:px-10 lg:px-16; }
+.shell { @apply container-px mx-auto max-w-7xl 2xl:max-w-screen-2xl; }
+
+.text-muted { color: var(--muted); }
+.text-muted-strong { color: var(--muted-strong); }
+.text-subtle { color: var(--subtle); }
+.text-faint { color: var(--faint); }
+.text-accent { color: var(--accent); }
+
+.tabular { font-variant-numeric: tabular-nums; }
+
+.eyebrow {
+  @apply text-xs uppercase tracking-[0.2em] font-medium;
+  color: var(--accent);
+  text-shadow: 0 0 8px rgba(255, 107, 53, 0.3);
+}
+
+.grid-bg {
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(ellipse at center, black 40%, transparent 75%);
+  -webkit-mask-image: radial-gradient(ellipse at center, black 40%, transparent 75%);
+}
+
+/* Ambient colour wash used behind hero and section headers */
+.glow-orange {
+  background: rgba(255, 107, 53, 0.2);
+  filter: blur(120px);
+}
+.glow-blue {
+  background: rgba(37, 99, 235, 0.18);
+  filter: blur(120px);
+}
+
+/* Skip link */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 12px;
+  background: var(--accent);
+  color: #FFFFFF;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  z-index: 100;
+  transition: top 150ms ease-out;
+}
+.skip-link:focus { top: 12px; }
+
+/* Marquee */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 40s linear infinite;
+}
+.marquee-mask {
+  mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+}
+
+/* Card surface + hover lift */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+.lift {
+  transition: transform 250ms cubic-bezier(0.22, 1, 0.36, 1), border-color 250ms ease,
+    box-shadow 250ms ease;
+}
+.lift:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 107, 53, 0.4);
+  box-shadow: 0 0 24px rgba(255, 107, 53, 0.12);
+}
+
+/* ---------- Buttons ---------- */
+.btn {
+  @apply inline-flex items-center justify-center gap-2 h-12 px-6 rounded-full text-sm font-medium;
+  transition: background 250ms ease, color 250ms ease, border-color 250ms ease,
+    box-shadow 250ms ease, transform 250ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+.btn-primary {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+.btn-primary:hover:not(:disabled) {
+  box-shadow: var(--glow-lg);
+  transform: translateY(-1px);
+}
+
+.btn-ghost {
+  border: 1px solid var(--border);
+  color: var(--fg);
+  background: transparent;
+}
+.btn-ghost:hover:not(:disabled) {
+  border-color: var(--accent);
+  box-shadow: 0 0 20px rgba(255, 107, 53, 0.3);
+}
+
+/* ---------- Form fields ---------- */
+.field {
+  @apply w-full h-12 px-4 rounded-2xl text-base;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--fg);
+  transition: border-color 250ms ease, box-shadow 250ms ease;
+}
+textarea.field { @apply h-auto py-3; }
+.field::placeholder { color: var(--subtle); }
+.field:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.18);
+}
+.field[aria-invalid="true"] { border-color: var(--destructive); }
+
+/* Native select needs an explicit dark option background on Windows */
+.field option {
+  background: var(--surface);
+  color: var(--fg);
+}
+
+.label {
+  @apply block text-sm font-medium mb-2;
+  color: var(--muted-strong);
+}
