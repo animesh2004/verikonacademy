@@ -5,6 +5,21 @@
  * components. Content marked REVIEW is my best guess and needs your sign-off.
  */
 
+export type SessionItem = {
+  session: string;
+  title: string;
+  duration: string;
+  points: string[];
+};
+
+export type DayPlan = {
+  dayNumber: number;
+  dayTitle: string;
+  subtitle: string;
+  totalHours: string;
+  sessions: SessionItem[];
+};
+
 export type Module = {
   title: string;
   points: string[];
@@ -27,110 +42,155 @@ export const workshop = {
   subtitle: "Run real models on real hardware, offline and in milliseconds",
   level: "Beginner to intermediate", // REVIEW
   format: "In person on campus, or live online", // REVIEW
-  hours: 16, // REVIEW
-  sessions: 4, // REVIEW
-  days: 2, // REVIEW
+  hours: 13,
+  sessions: 7,
+  days: 2,
   priceInr: 0, // 0 hides pricing; set a number to show it. REVIEW
 
   summary:
-    "Cloud inference is easy to demo and expensive to live with. Edge AI is the other path: a model small enough and fast enough to run on the device in front of you. No round trip, no bandwidth bill, no data leaving the room. Over two days you take a trained model, shrink it, and get it running on real hardware you can hold.",
+    "Cloud inference is easy to demo and expensive to scale. Edge AI is the other path: running real-time vision pipelines, local Small Language Models (1B–3B), and Vision-Language Models directly on edge GPU hardware like NVIDIA Jetson. Over two days, you take raw PyTorch/YOLO models, optimize them into TensorRT .engine files, deploy local GenAI with Ollama & llama.cpp, and assemble a complete Multimodal Edge Assistant.",
 
   /** Short pitch used in the hero and meta description. */
   blurb:
-    "A hands-on workshop on running machine-learning models directly on devices: microcontrollers, single-board computers, and edge accelerators.",
+    "A hands-on workshop on NVIDIA Jetson architecture, YOLO vision pipelines, local Small Language Models (Llama 3.2, Qwen 2.5), TensorRT acceleration, and Multimodal AI.",
 
   whyItMatters: [
     {
-      title: "Latency you cannot buy",
-      body: "A round trip to a data centre costs you 50–300 ms before the model even starts. On-device inference answers in single-digit milliseconds. For anything touching a camera, a motor, or a person, that gap decides whether the product works.",
+      title: "Single-Digit Millisecond Latency",
+      body: "A round trip to a cloud API costs 50–300 ms before inference even starts. On-device TensorRT execution on Jetson CUDA and Tensor Cores delivers instant results for real-time video and robotics.",
     },
     {
-      title: "Data that never leaves",
-      body: "The cheapest way to solve a privacy problem is to not transmit the data. Edge inference keeps video, audio, and sensor streams on the device, which turns a compliance conversation into an architecture diagram.",
+      title: "Private Local GenAI (1B–3B SLMs)",
+      body: "Run lightweight models like Llama 3.2, Qwen 2.5, and Phi-3.5 locally using Ollama and llama.cpp with CUDA acceleration—zero API subscription costs and total data privacy.",
     },
     {
-      title: "Costs that do not scale with usage",
-      body: "Cloud inference bills per call, forever. Hardware is bought once. At any real deployment size the economics stop being close.",
+      title: "TensorRT Model Acceleration",
+      body: "Convert standard PyTorch & ONNX models into FP16 and INT8 quantized TensorRT .engine files to unlock massive FPS gains on edge hardware.",
     },
     {
-      title: "It works when the network does not",
-      body: "Factory floors, farms, vehicles, and most of rural India do not have reliable connectivity. A model on the device does not care.",
+      title: "Vision + Language Intelligence",
+      body: "Combine OpenCV video detection streams with Vision-Language Models (VLMs) and SLM reasoning to turn raw pixel data into actionable, structured alerts.",
     },
   ],
 
   outcomes: [
-    "Explain honestly when Edge AI is the right answer, and when a cloud API is simply better",
-    "Take a trained model and cut it down with quantization and pruning without wrecking its accuracy",
-    "Convert and deploy a model to TensorFlow Lite / LiteRT and ONNX Runtime",
-    "Get a vision model running on a Raspberry Pi and a keyword-spotting model on a microcontroller",
-    "Measure what actually matters on device: latency, memory footprint, and power draw",
-    "Leave with a working demo on hardware and the code that produced it",
+    "Inspect NVIDIA Jetson GPU memory and manage hardware power profiles using jtop and nvpmodel",
+    "Build high-FPS OpenCV video pipelines with pre-trained YOLO object detection models",
+    "Run local Small Language Models (1B–3B) using Ollama and llama.cpp with CUDA acceleration",
+    "Quantize PyTorch/ONNX models into optimized TensorRT .engine files to maximize FPS",
+    "Query video frames with natural language prompts using Vision-Language Models (VLMs)",
+    "Assemble the Multimodal Edge Assistant capstone (Vision Detection → SLM Analysis → Structured Alert)",
   ],
 
   curriculum: [
     {
-      title: "Session 1: What runs where",
-      points: [
-        "The edge hardware landscape: microcontrollers, Raspberry Pi, Jetson, NPUs, and accelerators",
-        "Reading a datasheet for what matters: RAM, flash, clock, and thermal headroom",
-        "The decision framework: when the cloud wins and you should say so",
-        "Setting up the toolchain and flashing your first board",
+      dayNumber: 1,
+      dayTitle: "Day 1: Edge Computing, Vision AI & Local Language Models",
+      subtitle: "Foundations of Edge AI, GPU video pipelines, and local SLM inference.",
+      totalHours: "6 Hours",
+      sessions: [
+        {
+          session: "Session 1",
+          title: "The Edge AI Landscape & Remote Setup",
+          duration: "2 Hours",
+          points: [
+            "Why Edge AI? Balancing latency, bandwidth, privacy, and cloud costs.",
+            "Hardware tour: NVIDIA Jetson architecture (CUDA Cores, Tensor Cores, Unified Memory).",
+            "Connecting to cloud-hosted Jetson environments; inspecting memory with jtop and managing power modes (nvpmodel).",
+          ],
+        },
+        {
+          session: "Session 2",
+          title: "Computer Vision & Object Detection",
+          duration: "2 Hours",
+          points: [
+            "Processing video streams using OpenCV pipelines.",
+            "Running pre-trained YOLO object detection models on the Jetson GPU.",
+            "Measuring baseline performance: Latency, FPS, and RAM consumption.",
+          ],
+        },
+        {
+          session: "Session 3",
+          title: "Small Language Models (SLMs) on the Edge",
+          duration: "2 Hours",
+          points: [
+            "Introduction to Edge GenAI: Running 1B–3B parameter models locally (Llama 3.2, Qwen 2.5, Phi-3.5).",
+            "Setting up lightweight runtimes (Ollama / llama.cpp with CUDA acceleration).",
+            "Writing Python wrappers to prompt local models for automated log generation and decision-making.",
+          ],
+        },
       ],
     },
     {
-      title: "Session 2: Making models small",
-      points: [
-        "Where the size actually goes: parameters, activations, and runtime overhead",
-        "Post-training quantization vs quantization-aware training",
-        "Pruning and knowledge distillation, and the accuracy you pay for each",
-        "Measuring the trade-off instead of guessing at it",
+      dayNumber: 2,
+      dayTitle: "Day 2: Hardware Acceleration, Multimodal AI & Capstone Project",
+      subtitle: "NVIDIA TensorRT acceleration, Vision-Language Models, and guided capstone build.",
+      totalHours: "6.5 Hours",
+      sessions: [
+        {
+          session: "Session 1",
+          title: "Model Optimization with NVIDIA TensorRT",
+          duration: "2 Hours",
+          points: [
+            "Why standard PyTorch models choke on edge devices.",
+            "Quantization explained: Moving from FP32 to FP16 and INT8 precision.",
+            "Hands-on Lab: Converting PyTorch/ONNX models into optimized TensorRT .engine files to boost FPS.",
+          ],
+        },
+        {
+          session: "Session 2",
+          title: "Multimodal AI & Vision-Language Models",
+          duration: "1.5 Hours",
+          points: [
+            "Combining vision and language: Introduction to Vision-Language Models (VLMs) on Jetson.",
+            "Querying video frames with natural language prompts (e.g., \"Is the worker wearing safety gear?\").",
+          ],
+        },
+        {
+          session: "Session 3",
+          title: "Guided Capstone Build",
+          duration: "2.5 Hours",
+          points: [
+            "Group Project: Assemble the Multimodal Edge Assistant (Vision Detection → SLM Analysis → Structured Alert).",
+            "Testing, benchmarking performance gains (PyTorch vs. TensorRT), and Q&A.",
+          ],
+        },
+        {
+          session: "Session 4",
+          title: "Wrap-Up & Career Pathways",
+          duration: "0.5 Hours",
+          points: [
+            "Showcase of student projects, GitHub setup guidance, and industry applications in robotics/IoT.",
+          ],
+        },
       ],
     },
-    {
-      title: "Session 3: Vision on a single-board computer",
-      points: [
-        "Converting to TensorFlow Lite / LiteRT and ONNX Runtime",
-        "Running MobileNet and a small YOLO variant on a Raspberry Pi",
-        "Camera pipelines, pre-processing cost, and the frame budget",
-        "Profiling latency and finding where the milliseconds went",
-      ],
-    },
-    {
-      title: "Session 4: TinyML on a microcontroller, and shipping it",
-      points: [
-        "Keyword spotting on an MCU with TFLite Micro",
-        "Fitting a model into kilobytes of RAM",
-        "Power measurement and duty cycling for battery life",
-        "Over-the-air updates and monitoring a model you cannot SSH into",
-        "Capstone: your model, your board, running in front of the room",
-      ],
-    },
-  ] satisfies Module[],
+  ] satisfies DayPlan[],
 
   forWhom: [
     "Students from any engineering branch: CSE, IT, ECE, EE or ME",
-    "Anyone who has trained a model in a notebook but never deployed one",
-    "Embedded, instrumentation and IoT people adding ML to hardware they already build",
-    "Faculty and lab teams setting up an Edge AI practical",
+    "Anyone who wants to deploy local LLMs/SLMs, YOLO, and TensorRT on edge GPUs",
+    "Embedded, AI, and robotics enthusiasts building real-time vision and hardware intelligence",
+    "Faculty and lab teams setting up Edge AI and GenAI practical labs",
   ],
 
   prerequisites: [
-    "Basic Python, enough to read and modify a script. If you have only done C, you will keep up",
-    "No machine-learning background needed; we build it from the ground up",
-    "No electronics background needed either. The boards are explained from scratch",
-    "Open to every branch. Second year onward is the usual sweet spot",
-    "A laptop; we provide the boards and sensors during the workshop", // REVIEW
+    "Basic Python familiarity (enough to read and adapt scripts)",
+    "No prior machine-learning or electronics expertise required—built from first principles",
+    "Curiosity for Computer Vision, Local GenAI, and NVIDIA GPU acceleration",
+    "Open to 2nd year engineering students onward across all branches",
+    "A laptop with browser and terminal access; Jetson environments and code labs provided",
   ],
 
-  /** Hardware learners get their hands on. REVIEW — set to what you actually provide. */
+  /** Hardware learners get their hands on. */
   hardware: [
-    "Raspberry Pi with camera module",
-    "ESP32-class microcontroller",
-    "Edge accelerator (Coral / Jetson class)",
-    "Assorted sensors for the capstone",
+    "NVIDIA Jetson Architecture (CUDA Cores, Tensor Cores & Unified Memory)",
+    "Cloud-Hosted & Physical Jetson GPU Developer Environments",
+    "OpenCV Video Streams & Camera Pipeline Runtimes",
+    "Accelerated Local Edge Frameworks (TensorRT, Ollama, llama.cpp, PyTorch)",
   ],
 
-  batches: [] as Batch[], // REVIEW — add dates and they appear on the page automatically
+  batches: [] as Batch[],
 };
 
 export type Workshop = typeof workshop;
@@ -147,46 +207,46 @@ export type Branch = {
 };
 
 /**
- * Edge AI sits at the junction of software, electronics, power and machines,
- * so it is genuinely a cross-branch subject. This section exists so a student
- * from any department can find themselves on the page instead of assuming it
- * is a computer-science event.
- */
+  * Edge AI sits at the junction of software, electronics, power and machines,
+  * so it is genuinely a cross-branch subject. This section exists so a student
+  * from any department can find themselves on the page instead of assuming it
+  * is a computer-science event.
+  */
 export const branches: Branch[] = [
   {
     code: "CSE",
     name: "Computer Science",
-    hook: "The model you trained, made small enough to ship.",
-    body: "You already know how to train. This is the half that decides whether it ever reaches a user: quantization, pruning, inference runtimes, and the profiling that tells you where the milliseconds went.",
-    project: "A vision model quantized 4× and benchmarked on a Raspberry Pi",
+    hook: "The AI model you trained, deployed locally on Jetson GPUs.",
+    body: "Go beyond cloud API wrappers. Learn CUDA-accelerated runtimes, TensorRT FP16/INT8 quantization, and deploying 1B–3B Small Language Models locally with Ollama.",
+    project: "Multimodal Edge Assistant combining YOLO vision & local Llama 3.2",
   },
   {
     code: "IT",
     name: "Information Technology",
-    hook: "The architecture around a thousand devices you cannot SSH into.",
-    body: "Edge inference changes the system design, not just the model: what stays local, what syncs, how updates roll out safely, and how you keep sensor data from ever leaving the building.",
-    project: "A device that infers locally and syncs only summaries upstream",
+    hook: "Private, on-premise GenAI systems with zero cloud latency.",
+    body: "Architect private edge intelligence pipelines. Run local SLMs for automated log generation, scene analysis, and edge data processing without transmitting raw frames upstream.",
+    project: "Private Edge GenAI log generator & automated decision-making system",
   },
   {
     code: "ECE",
     name: "Electronics & Communication",
-    hook: "Your home ground. Inference on a microcontroller.",
-    body: "Everything you know about embedded systems, sensors and signal processing applies directly. We go down to TinyML on an MCU: fitting a model into kilobytes and feeding it clean, well-conditioned signals.",
-    project: "Keyword spotting running on an ESP32 in a few hundred KB",
+    hook: "Hardware acceleration on NVIDIA Jetson architecture.",
+    body: "Master CUDA Cores, Tensor Cores, and Unified Memory. Learn how to convert PyTorch/ONNX models into optimized TensorRT .engine files for ultra-high FPS.",
+    project: "TensorRT INT8 engine optimization & jtop/nvpmodel GPU profiling",
   },
   {
     code: "EE",
     name: "Electrical Engineering",
-    hook: "Inference measured in milliwatts, not just milliseconds.",
-    body: "On a battery, power is the real constraint. We measure current draw, duty-cycle the inference loop, and look at where hardware acceleration actually pays for itself against its own power cost.",
-    project: "Fault detection on motor current, running within a battery budget",
+    hook: "Performance-per-watt profiling and Jetson power mode control.",
+    body: "Understand power constraints in edge compute. Learn how nvpmodel manages power profiles and measure real-time FPS/watt efficiency during heavy GPU inference.",
+    project: "Power profile benchmarking & FPS-per-watt optimization on Jetson",
   },
   {
     code: "ME",
     name: "Mechanical Engineering",
-    hook: "Machines that notice their own bearings failing.",
-    body: "Predictive maintenance is the flagship Edge AI application, and it is mechanical at heart. Vibration and acoustic signatures, caught on the machine itself, before the failure reaches the shop floor.",
-    project: "A vibration-based anomaly detector mounted on a rotating machine",
+    hook: "Automated visual inspection and robotics intelligence.",
+    body: "Deploy Vision-Language Models (VLMs) and YOLO object detection for real-time safety monitoring, defect identification, and industrial automation control.",
+    project: "Vision-Language Model safety gear query system for workplace automation",
   },
 ];
 
