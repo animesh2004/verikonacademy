@@ -5,17 +5,22 @@ import { getLocalRegistrations } from "@/lib/storage";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+const ADMIN_SECRET = process.env.ADMIN_KEY ?? "verikon2026";
+
+export async function GET(request: Request) {
+  // Security check: Verify admin secret key
+  const authHeader = request.headers.get("x-admin-key") || request.headers.get("authorization");
+  const token = authHeader?.replace(/^Bearer\s+/i, "");
+
+  if (token !== ADMIN_SECRET) {
+    return NextResponse.json(
+      { ok: false, error: "Unauthorized access. Invalid admin key." },
+      { status: 401 }
+    );
+  }
+
   const localList = getLocalRegistrations();
   const supabase = getServiceClient();
-
-  if (!supabase) {
-    return NextResponse.json({
-      ok: true,
-      source: "local",
-      registrations: localList,
-    });
-  }
 
   try {
     const { data, error } = await supabase
@@ -24,7 +29,7 @@ export async function GET() {
       .order("created_at", { ascending: false });
 
     if (error) {
-      console.warn("[admin/registrations] Supabase query error, returning local:", error.message);
+      console.warn("[admin/registrations] Supabase query notice:", error.message);
       return NextResponse.json({
         ok: true,
         source: "local_fallback",

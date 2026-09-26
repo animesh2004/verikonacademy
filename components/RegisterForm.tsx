@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { CheckCircle2, Loader2 } from "lucide-react";
+import { CheckCircle2, Loader2, RotateCcw } from "lucide-react";
 import { workshop } from "@/lib/workshop";
 
 type Status = "idle" | "submitting" | "done" | "error";
@@ -41,7 +41,7 @@ export default function RegisterForm() {
 
     const form = new FormData(e.currentTarget);
     const payload = Object.fromEntries(form.entries());
-    const org = String(payload.organisation || payload.institutionName || "").trim();
+    const org = String(payload.organisation || "").trim();
     setSubmittedOrg(org);
 
     try {
@@ -77,6 +77,17 @@ export default function RegisterForm() {
           {message ??
             "Thank you for reaching out. We will review your campus requirements, hardware logistics, and cohort size, and get in touch within two working days to schedule a kickoff call."}
         </p>
+        <button
+          type="button"
+          onClick={() => {
+            setStatus("idle");
+            setMessage(null);
+          }}
+          className="mt-6 inline-flex items-center gap-2 btn btn-ghost text-xs px-4 py-2 border border-[#262626]"
+        >
+          <RotateCcw className="size-3.5" />
+          Submit another request
+        </button>
       </div>
     );
   }
@@ -86,6 +97,15 @@ export default function RegisterForm() {
       onSubmit={onSubmit}
       className="rounded-3xl border border-[#1a1a1a] bg-[#0f1012] p-7 sm:p-10"
     >
+      {/* Bot honeypot trap */}
+      <input
+        type="text"
+        name="hp"
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden="true"
+        style={{ display: "none", position: "absolute", left: "-9999px" }}
+      />
       <input type="hidden" name="courseSlug" value={workshop.slug} />
 
       <div className="grid gap-6 sm:grid-cols-2">
@@ -100,6 +120,8 @@ export default function RegisterForm() {
             placeholder="e.g. Delhi Technological University, IIT Kanpur, or Company Name"
             autoComplete="organization"
             required
+            minLength={2}
+            maxLength={200}
           />
         </div>
 
@@ -114,6 +136,8 @@ export default function RegisterForm() {
             placeholder="e.g. Prof. Sharma / Dr. Verma / Animesh"
             autoComplete="name"
             required
+            minLength={2}
+            maxLength={120}
           />
         </div>
 
@@ -129,6 +153,7 @@ export default function RegisterForm() {
             placeholder="name@institution.edu or work email"
             autoComplete="email"
             required
+            maxLength={200}
           />
         </div>
 
@@ -144,6 +169,8 @@ export default function RegisterForm() {
             placeholder="+91 98765 43210"
             autoComplete="tel"
             required
+            minLength={7}
+            maxLength={30}
           />
         </div>
 
@@ -194,6 +221,7 @@ export default function RegisterForm() {
             id="notes"
             name="notes"
             rows={4}
+            maxLength={2000}
             className="field"
             placeholder="Tell us about target student branches (e.g. CSE/ECE/AI), preferred dates or semester timeline, available lab setups, or any specific goals."
           />

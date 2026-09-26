@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Building2, Calendar, Mail, Phone, RefreshCw, Users, ShieldAlert, CheckCircle2 } from "lucide-react";
+import { Building2, Calendar, Mail, Phone, RefreshCw, Lock, LogOut, KeyRound } from "lucide-react";
 import Link from "next/link";
 
 type Registration = {
@@ -21,30 +21,69 @@ type Registration = {
 };
 
 export default function AdminPage() {
-  const [loading, setLoading] = useState(true);
+  const [adminKey, setAdminKey] = useState<string>("");
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [keyInput, setKeyInput] = useState<string>("");
+  const [authError, setAuthError] = useState<string | null>(null);
+
+  const [loading, setLoading] = useState(false);
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [source, setSource] = useState<string>("");
   const [search, setSearch] = useState("");
 
-  async function fetchRegistrations() {
+  useEffect(() => {
+    const saved = sessionStorage.getItem("verikon_admin_key");
+    if (saved) {
+      setAdminKey(saved);
+      fetchRegistrations(saved);
+    }
+  }, []);
+
+  async function fetchRegistrations(keyToUse?: string) {
+    const key = keyToUse || adminKey;
+    if (!key) return;
+
     setLoading(true);
+    setAuthError(null);
+
     try {
-      const res = await fetch("/api/admin/registrations");
+      const res = await fetch("/api/admin/registrations", {
+        headers: { "x-admin-key": key },
+      });
       const data = await res.json();
-      if (data.ok) {
-        setRegistrations(data.registrations || []);
-        setSource(data.source || "unknown");
+
+      if (res.status === 401 || !data.ok) {
+        setIsAuthenticated(false);
+        setAuthError(data.error || "Incorrect admin key. Access denied.");
+        sessionStorage.removeItem("verikon_admin_key");
+        return;
       }
-    } catch (e) {
-      console.error(e);
+
+      setIsAuthenticated(true);
+      sessionStorage.setItem("verikon_admin_key", key);
+      setRegistrations(data.registrations || []);
+      setSource(data.source || "unknown");
+    } catch {
+      setAuthError("Failed to reach server. Please try again.");
     } finally {
       setLoading(false);
     }
   }
 
-  useEffect(() => {
-    fetchRegistrations();
-  }, []);
+  function handleLogin(e: React.FormEvent) {
+    e.preventDefault();
+    if (!keyInput.trim()) return;
+    setAdminKey(keyInput.trim());
+    fetchRegistrations(keyInput.trim());
+  }
+
+  function handleLogout() {
+    sessionStorage.removeItem("verikon_admin_key");
+    setIsAuthenticated(false);
+    setAdminKey("");
+    setKeyInput("");
+    setRegistrations([]);
+  }
 
   const filtered = registrations.filter((r) => {
     const q = search.toLowerCase();
@@ -56,6 +95,59 @@ export default function AdminPage() {
     );
   });
 
+  // Render Passcode Screen if not authenticated
+  if (!isAuthenticated) {
+    return (
+      <main className="min-h-screen pt-36 pb-20 bg-[#090A0C] text-white flex items-center justify-center px-4">
+        <div className="w-full max-w-md rounded-3xl border border-[#1a1a1a] bg-[#0f1012] p-8 sm:p-10 text-center">
+          <div className="size-12 rounded-2xl bg-[#16181b] border border-[#262626] mx-auto grid place-items-center text-accent">
+            <Lock className="size-6" />
+          </div>
+
+          <h1 className="mt-5 font-display font-bold text-2xl text-white">
+            Admin Access Required
+          </h1>
+          <p className="mt-2 text-sm text-muted">
+            Enter your admin passcode to access institutional registration records.
+          </p>
+
+          <form onSubmit={handleLogin} className="mt-6 space-y-4">
+            <div className="relative">
+              <input
+                type="password"
+                placeholder="Enter admin passcode"
+                value={keyInput}
+                onChange={(e) => setKeyInput(e.target.value)}
+                className="field text-center tracking-widest text-sm"
+                required
+                autoFocus
+              />
+            </div>
+
+            {authError && (
+              <p role="alert" className="text-xs text-[color:var(--destructive)]">
+                {authError}
+              </p>
+            )}
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full btn btn-primary justify-center"
+            >
+              {loading ? "Authenticating..." : "Unlock Dashboard"}
+            </button>
+          </form>
+
+          <p className="mt-6 text-xs text-subtle">
+            Default passcode: <code className="text-muted">verikon2026</code>
+          </p>
+        </div>
+      </main>
+    );
+  }
+
+  // Render Authenticated Dashboard
   return (
     <main className="min-h-screen pt-28 sm:pt-36 pb-20 bg-[#090A0C] text-white">
       <div className="shell">
@@ -72,12 +164,19 @@ export default function AdminPage() {
 
           <div className="flex items-center gap-3">
             <button
-              onClick={fetchRegistrations}
+              onClick={() => fetchRegistrations()}
               className="btn btn-ghost text-xs px-3 py-2 border border-[#262626] hover:bg-[#16181B]"
               disabled={loading}
             >
               <RefreshCw className={`size-3.5 ${loading ? "animate-spin" : ""}`} />
               Refresh
+            </button>
+            <button
+              onClick={handleLogout}
+              className="btn btn-ghost text-xs px-3 py-2 border border-[#262626] hover:bg-[#16181B] text-muted hover:text-white"
+            >
+              <LogOut className="size-3.5" />
+              Lock
             </button>
             <Link href="/" className="btn btn-ghost text-xs px-3 py-2 border border-[#262626]">
               View Site

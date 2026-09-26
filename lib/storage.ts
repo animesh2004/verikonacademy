@@ -1,7 +1,11 @@
 import fs from "fs";
 import path from "path";
 
-const DATA_DIR = path.join(process.cwd(), "data");
+// On Vercel / serverless functions, only /tmp is writable.
+const DATA_DIR = process.env.VERCEL
+  ? path.join("/tmp", "verikon_data")
+  : path.join(process.cwd(), "data");
+
 const REGISTRATIONS_FILE = path.join(DATA_DIR, "registrations.json");
 
 export type StoredRegistration = {
@@ -47,7 +51,7 @@ export function saveLocalRegistration(record: Record<string, unknown>): boolean 
     fs.writeFileSync(REGISTRATIONS_FILE, JSON.stringify(existing, null, 2), "utf-8");
     return true;
   } catch (err) {
-    console.error("[storage] Failed to save local registration fallback:", err);
+    console.error("[storage] Failed to save local fallback registration:", err);
     return false;
   }
 }

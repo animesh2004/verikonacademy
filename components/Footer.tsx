@@ -78,7 +78,7 @@ export default function Footer() {
                   href={site.parentUrl}
                   className="hover:text-white transition-colors duration-250"
                   target="_blank"
-                  rel="noreferrer"
+                  rel="noopener noreferrer"
                 >
                   {site.parent} ↗
                 </a>
@@ -94,20 +94,20 @@ export default function Footer() {
               href={site.parentUrl}
               className="text-white hover:text-accent transition-colors duration-250"
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
             >
               {site.parent}
             </a>
             .
           </p>
           <div className="flex items-center gap-6">
-            <a href={site.social.linkedin} target="_blank" rel="noreferrer" className="hover:text-white transition-colors duration-250">
+            <a href={site.social.linkedin} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors duration-250">
               LinkedIn
             </a>
-            <a href={site.social.x} target="_blank" rel="noreferrer" className="hover:text-white transition-colors duration-250">
+            <a href={site.social.x} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors duration-250">
               X
             </a>
-            <a href={site.social.instagram} target="_blank" rel="noreferrer" className="hover:text-white transition-colors duration-250">
+            <a href={site.social.instagram} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors duration-250">
               Instagram
             </a>
           </div>
