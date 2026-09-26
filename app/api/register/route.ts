@@ -17,6 +17,10 @@ type Body = {
   branch?: string;
   experience?: string;
   goal?: string;
+  role?: string;
+  cohortSize?: string;
+  format?: string;
+  notes?: string;
 };
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
@@ -32,16 +36,37 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: "Malformed request." }, { status: 400 });
   }
 
+  const organisation = clean(body.organisation, 200);
   const name = clean(body.name, 120);
   const email = clean(body.email, 200);
+  const phone = clean(body.phone, 40);
   const courseSlug = clean(body.courseSlug, 100);
+  const role = clean(body.role, 100);
+  const cohortSize = clean(body.cohortSize, 100);
+  const format = clean(body.format, 100);
+  const notes = clean(body.notes ?? body.goal, 2000);
 
+  if (!organisation) {
+    return NextResponse.json(
+      { ok: false, error: "Please enter your institution or college name." },
+      { status: 400 }
+    );
+  }
   if (!name) {
-    return NextResponse.json({ ok: false, error: "Please tell us your name." }, { status: 400 });
+    return NextResponse.json(
+      { ok: false, error: "Please provide the contact person's name." },
+      { status: 400 }
+    );
   }
   if (!email || !EMAIL_RE.test(email)) {
     return NextResponse.json(
       { ok: false, error: "Please enter a valid email address." },
+      { status: 400 }
+    );
+  }
+  if (!phone) {
+    return NextResponse.json(
+      { ok: false, error: "Please provide a contact phone number." },
       { status: 400 }
     );
   }
@@ -58,21 +83,27 @@ export async function POST(request: Request) {
       ? batchStartsOn
       : null;
 
+  const goalSummaryParts = [
+    cohortSize ? `Cohort Size: ${cohortSize}` : null,
+    role ? `Role: ${role}` : null,
+    format ? `Preferred Format: ${format}` : null,
+    notes ? `\nNotes & Requirements:\n${notes}` : null,
+  ].filter(Boolean);
+
   const record = {
-    // Tags this row as a course lead so it can be told apart from the agency's
-    // service enquiries in the all_leads view. See supabase/schema.sql.
     enquiry_type: "course",
     name,
     email,
-    phone: clean(body.phone, 40),
-    organisation: clean(body.organisation, 160),
+    phone,
+    organisation,
     course_slug: workshop.slug,
     course_title: workshop.title,
     batch_starts_on: validBatch,
-    attending_as: clean(body.attendingAs, 60),
-    branch: clean(body.branch, 40),
-    experience: clean(body.experience, 60),
-    goal: clean(body.goal, 2000),
+    attending_as: role ? `Institution (${role})` : "Institution",
+    branch: cohortSize ?? clean(body.branch, 40),
+    experience: format ?? clean(body.experience, 60),
+    goal: goalSummaryParts.join(" | "),
+    notes: `Cohort: ${cohortSize ?? "N/A"} | Role: ${role ?? "N/A"} | Format: ${format ?? "N/A"}`,
     source: clean(request.headers.get("referer"), 300),
     user_agent: clean(request.headers.get("user-agent"), 400),
   };
@@ -80,14 +111,13 @@ export async function POST(request: Request) {
   const supabase = getServiceClient();
 
   if (!supabase) {
-    // Supabase not wired up yet. Never pretend a real registration was stored.
     console.warn("[register] Supabase is not configured — registration not stored:", record);
 
     if (process.env.NODE_ENV === "production") {
       return NextResponse.json(
         {
           ok: false,
-          error: `Our registration system is not reachable right now. Please email ${site.email} and we will hold your seat.`,
+          error: `Our registration system is not reachable right now. Please email ${site.email} directly and we will take care of your request.`,
         },
         { status: 503 }
       );
@@ -96,18 +126,17 @@ export async function POST(request: Request) {
     return NextResponse.json({
       ok: true,
       message:
-        "Logged to the server console. Supabase is not configured in this environment, so nothing was saved.",
+        "Registration received! (Development mode: logged to server console as Supabase is not configured locally).",
     });
   }
 
   const { error } = await supabase.from("registrations").insert(record);
 
   if (error) {
-    // 23505 = unique violation, i.e. this email already registered for this workshop.
     if (error.code === "23505") {
       return NextResponse.json({
         ok: true,
-        message: "You are already on the list. We will be in touch shortly.",
+        message: "Your institution is already registered with us. We will be in touch shortly.",
       });
     }
 
@@ -115,7 +144,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         ok: false,
-        error: `We could not save your registration. Please email ${site.email} and we will sort it out.`,
+        error: `We could not save your registration. Please email ${site.email} directly and we will assist you.`,
       },
       { status: 500 }
     );

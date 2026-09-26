@@ -2,27 +2,37 @@
 
 import { useState } from "react";
 import { CheckCircle2, Loader2 } from "lucide-react";
-import { branches, formatDate, workshop } from "@/lib/workshop";
+import { workshop } from "@/lib/workshop";
 
 type Status = "idle" | "submitting" | "done" | "error";
 
-const experienceOptions = [
-  "Student, no professional experience yet",
-  "Just starting out",
-  "1–3 years in the field",
-  "3–7 years",
-  "7+ years",
+const cohortSizes = [
+  "30–60 students (Single batch)",
+  "60–120 students (Department-wide)",
+  "120–250 students (Campus-level / Multi-batch)",
+  "250+ students (College summit / Hackathon)",
+  "Custom / To be decided",
 ];
 
-const attendingAs = [
-  "Myself",
-  "A student group / college",
-  "A company team",
+const roles = [
+  "Faculty / Professor",
+  "Head of Department (HOD) / Dean",
+  "Training & Placement Officer (TPO)",
+  "Student Club Lead / Student Representative",
+  "Corporate Training Lead / HR",
+  "Other",
+];
+
+const formats = [
+  "On-campus (We bring edge hardware & kits to your campus)",
+  "Live Online / Virtual",
+  "Hybrid / Open to discussion",
 ];
 
 export default function RegisterForm() {
   const [status, setStatus] = useState<Status>("idle");
   const [message, setMessage] = useState<string | null>(null);
+  const [submittedOrg, setSubmittedOrg] = useState<string>("");
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -31,6 +41,8 @@ export default function RegisterForm() {
 
     const form = new FormData(e.currentTarget);
     const payload = Object.fromEntries(form.entries());
+    const org = String(payload.organisation || payload.institutionName || "").trim();
+    setSubmittedOrg(org);
 
     try {
       const res = await fetch("/api/register", {
@@ -57,11 +69,13 @@ export default function RegisterForm() {
   if (status === "done") {
     return (
       <div className="rounded-3xl border border-[#1a1a1a] bg-[#0f1012] p-10 text-center">
-        <CheckCircle2 className="mx-auto size-10 text-accent" aria-hidden="true" />
-        <h2 className="mt-5 font-display font-bold text-2xl text-white">Registration received</h2>
-        <p className="mt-3 text-muted leading-relaxed max-w-md mx-auto">
+        <CheckCircle2 className="mx-auto size-12 text-accent" aria-hidden="true" />
+        <h2 className="mt-5 font-display font-bold text-2xl text-white">
+          {submittedOrg ? `Registration received for ${submittedOrg}` : "Institutional Registration Received"}
+        </h2>
+        <p className="mt-3 text-muted leading-relaxed max-w-lg mx-auto">
           {message ??
-            "We will email you within two working days with dates, joining details, and a short prep list. If it is urgent, just reply to that email."}
+            "Thank you for reaching out. We will review your campus requirements, hardware logistics, and cohort size, and get in touch within two working days to schedule a kickoff call."}
         </p>
       </div>
     );
@@ -75,39 +89,44 @@ export default function RegisterForm() {
       <input type="hidden" name="courseSlug" value={workshop.slug} />
 
       <div className="grid gap-6 sm:grid-cols-2">
-        {workshop.batches.length > 0 && (
-          <div className="sm:col-span-2">
-            <label className="label" htmlFor="batchStartsOn">
-              Preferred dates
-            </label>
-            <select id="batchStartsOn" name="batchStartsOn" className="field" defaultValue="">
-              <option value="">No preference, tell me what is available</option>
-              {workshop.batches.map((b) => (
-                <option key={b.startsOn} value={b.startsOn}>
-                  {formatDate(b.startsOn)} · {b.where}
-                  {b.seatsLeft === 0 ? " · waitlist" : ` · ${b.seatsLeft} seats left`}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
+        <div className="sm:col-span-2">
+          <label className="label" htmlFor="organisation">
+            Institution / College / University name <span className="text-accent">*</span>
+          </label>
+          <input
+            id="organisation"
+            name="organisation"
+            className="field"
+            placeholder="e.g. Delhi Technological University, IIT Kanpur, or Company Name"
+            autoComplete="organization"
+            required
+          />
+        </div>
 
         <div>
           <label className="label" htmlFor="name">
-            Full name
+            Contact person name <span className="text-accent">*</span>
           </label>
-          <input id="name" name="name" className="field" autoComplete="name" required />
+          <input
+            id="name"
+            name="name"
+            className="field"
+            placeholder="e.g. Prof. Sharma / Dr. Verma / Animesh"
+            autoComplete="name"
+            required
+          />
         </div>
 
         <div>
           <label className="label" htmlFor="email">
-            Email
+            Official / Work email <span className="text-accent">*</span>
           </label>
           <input
             id="email"
             name="email"
             type="email"
             className="field"
+            placeholder="name@institution.edu or work email"
             autoComplete="email"
             required
           />
@@ -115,76 +134,68 @@ export default function RegisterForm() {
 
         <div>
           <label className="label" htmlFor="phone">
-            Phone <span className="font-normal text-subtle">(optional)</span>
-          </label>
-          <input id="phone" name="phone" type="tel" className="field" autoComplete="tel" />
-        </div>
-
-        <div>
-          <label className="label" htmlFor="organisation">
-            College or company <span className="font-normal text-subtle">(optional)</span>
+            Phone number <span className="text-accent">*</span>
           </label>
           <input
-            id="organisation"
-            name="organisation"
+            id="phone"
+            name="phone"
+            type="tel"
             className="field"
-            autoComplete="organization"
+            placeholder="+91 98765 43210"
+            autoComplete="tel"
+            required
           />
         </div>
 
         <div>
-          <label className="label" htmlFor="attendingAs">
-            Registering as
+          <label className="label" htmlFor="role">
+            Your role / designation
           </label>
-          <select id="attendingAs" name="attendingAs" className="field" defaultValue={attendingAs[0]}>
-            {attendingAs.map((o) => (
-              <option key={o} value={o}>
-                {o}
+          <select id="role" name="role" className="field" defaultValue={roles[0]}>
+            {roles.map((r) => (
+              <option key={r} value={r}>
+                {r}
               </option>
             ))}
           </select>
         </div>
 
         <div>
-          <label className="label" htmlFor="branch">
-            Your branch
+          <label className="label" htmlFor="cohortSize">
+            Expected cohort size <span className="text-accent">*</span>
           </label>
-          <select id="branch" name="branch" className="field" defaultValue="">
-            <option value="">Select a branch</option>
-            {branches.map((b) => (
-              <option key={b.code} value={b.code}>
-                {b.code} ({b.name})
+          <select id="cohortSize" name="cohortSize" className="field" defaultValue={cohortSizes[0]} required>
+            {cohortSizes.map((s) => (
+              <option key={s} value={s}>
+                {s}
               </option>
             ))}
-            <option value="Other">Other / not listed</option>
-            <option value="N/A">Not a student</option>
           </select>
         </div>
 
         <div>
-          <label className="label" htmlFor="experience">
-            Where are you starting from?
+          <label className="label" htmlFor="format">
+            Preferred format
           </label>
-          <select id="experience" name="experience" className="field" defaultValue="">
-            <option value="">Prefer not to say</option>
-            {experienceOptions.map((o) => (
-              <option key={o} value={o}>
-                {o}
+          <select id="format" name="format" className="field" defaultValue={formats[0]}>
+            {formats.map((f) => (
+              <option key={f} value={f}>
+                {f}
               </option>
             ))}
           </select>
         </div>
 
         <div className="sm:col-span-2">
-          <label className="label" htmlFor="goal">
-            What do you want to walk away with?
+          <label className="label" htmlFor="notes">
+            Notes, preferred dates or lab details <span className="font-normal text-subtle">(optional)</span>
           </label>
           <textarea
-            id="goal"
-            name="goal"
+            id="notes"
+            name="notes"
             rows={4}
             className="field"
-            placeholder="A sentence is plenty. If you have a device or a use case in mind, tell us. It shapes what we cover."
+            placeholder="Tell us about target student branches (e.g. CSE/ECE/AI), preferred dates or semester timeline, available lab setups, or any specific goals."
           />
         </div>
       </div>
@@ -198,9 +209,11 @@ export default function RegisterForm() {
       <div className="mt-8 flex flex-col sm:flex-row sm:items-center gap-4">
         <button type="submit" className="btn btn-primary" disabled={status === "submitting"}>
           {status === "submitting" && <Loader2 className="size-4 animate-spin" aria-hidden="true" />}
-          {status === "submitting" ? "Reserving your seat…" : "Reserve my seat"}
+          {status === "submitting" ? "Submitting request…" : "Submit institutional registration"}
         </button>
-        <p className="text-sm text-muted">No payment now. We confirm your seat by email first.</p>
+        <p className="text-sm text-muted">
+          No upfront payment. We reply within 2 working days with syllabus, hardware plan, and dates.
+        </p>
       </div>
     </form>
   );

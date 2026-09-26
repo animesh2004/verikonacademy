@@ -23,7 +23,7 @@ type Props = {
 export default function ReserveButton({
   className,
   children = "Reserve a seat",
-  pendingLabel = "Preparing a seat for you…",
+  pendingLabel = "Opening registration…",
   showArrow = false,
 }: Props) {
   const router = useRouter();

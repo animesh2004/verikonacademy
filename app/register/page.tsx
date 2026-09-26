@@ -4,8 +4,8 @@ import { site } from "@/lib/site";
 import { workshop } from "@/lib/workshop";
 
 export const metadata: Metadata = {
-  title: "Reserve a seat",
-  description: `Register for the ${workshop.title} workshop. No payment upfront, we confirm your seat by email.`,
+  title: "Institutional Registration — Verikon Academy",
+  description: `Register your college, university, or company cohort for the ${workshop.title} workshop. We bring hardware directly to your campus.`,
 };
 
 export default function RegisterPage() {
@@ -17,14 +17,13 @@ export default function RegisterPage() {
       />
       <div className="shell relative">
         <div className="max-w-2xl">
-          <div className="eyebrow mb-4">Registration</div>
+          <div className="eyebrow mb-4">Institutional Registration</div>
           <h1 className="font-display font-bold tracking-tightest text-5xl sm:text-6xl md:text-7xl leading-[0.95] text-balance text-white">
-            Reserve a seat on {workshop.title}
+            Host an Edge AI workshop at your campus
           </h1>
           <p className="mt-6 text-lg text-muted leading-relaxed">
-            Registrations are read by a person, not a funnel. We reply within two working days
-            with dates, joining details, and a short prep list. If we think the workshop is
-            wrong for where you are, we will say so.
+            Book hands-on hardware training for your college, university department, or organization.
+            We bring real NVIDIA Jetson hardware, AI sensors, and full curriculum directly to your campus or lab.
           </p>
         </div>
 
@@ -33,19 +32,26 @@ export default function RegisterPage() {
 
           <aside className="lg:pt-4 space-y-8 text-sm">
             <div>
-              <h2 className="font-display font-bold text-lg text-white">Bringing a group?</h2>
+              <h2 className="font-display font-bold text-lg text-white">Campus delivery</h2>
               <p className="mt-2 text-muted leading-relaxed">
-                Most of these run as campus or in-house sessions. Pick &ldquo;a student group&rdquo;
-                or &ldquo;a company team&rdquo; above and tell us rough numbers. We bring the
-                hardware to you.
+                We travel with NVIDIA Jetson development boards, camera sensors, and toolkits.
+                Your campus only needs to provide standard workstations or laptops and a projector.
               </p>
             </div>
 
             <div>
-              <h2 className="font-display font-bold text-lg text-white">Prefer to talk first?</h2>
+              <h2 className="font-display font-bold text-lg text-white">Cohort sizes</h2>
               <p className="mt-2 text-muted leading-relaxed">
-                Email us with what you are trying to build and we will tell you whether this is
-                the right workshop for it.
+                Whether organizing for a focused 40-student lab or a 200+ student college-wide
+                bootcamp, we calibrate our instructor-to-student ratio and hardware kits accordingly.
+              </p>
+            </div>
+
+            <div>
+              <h2 className="font-display font-bold text-lg text-white">Direct coordination</h2>
+              <p className="mt-2 text-muted leading-relaxed">
+                Need official proposals, MoUs, or custom curriculum tailoring for your department?
+                Reach our workshops team directly:
               </p>
               <a
                 href={`mailto:${site.email}`}
@@ -53,13 +59,6 @@ export default function RegisterPage() {
               >
                 {site.email}
               </a>
-            </div>
-
-            <div>
-              <h2 className="font-display font-bold text-lg text-white">Hardware</h2>
-              <p className="mt-2 text-muted leading-relaxed">
-                Boards, cameras, and sensors are provided. You only need a laptop.
-              </p>
             </div>
           </aside>
         </div>
