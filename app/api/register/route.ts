@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { workshop } from "@/lib/workshop";
 import { getServiceClient } from "@/lib/supabase";
 import { site } from "@/lib/site";
+import { saveLocalRegistration } from "@/lib/storage";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -96,6 +97,9 @@ export async function POST(request: Request) {
     email,
     phone,
     organisation,
+    role,
+    cohort_size: cohortSize,
+    format,
     course_slug: workshop.slug,
     course_title: workshop.title,
     batch_starts_on: validBatch,
@@ -111,44 +115,33 @@ export async function POST(request: Request) {
   const supabase = getServiceClient();
 
   if (!supabase) {
-    console.warn("[register] Supabase is not configured — registration not stored:", record);
-
-    if (process.env.NODE_ENV === "production") {
-      return NextResponse.json(
-        {
-          ok: false,
-          error: `Our registration system is not reachable right now. Please email ${site.email} directly and we will take care of your request.`,
-        },
-        { status: 503 }
-      );
-    }
-
-    return NextResponse.json({
-      ok: true,
-      message:
-        "Registration received! (Development mode: logged to server console as Supabase is not configured locally).",
-    });
+    console.warn("[register] Supabase is not configured — saving locally:", record);
+    saveLocalRegistration(record);
+    return NextResponse.json({ ok: true });
   }
 
-  const { error } = await supabase.from("registrations").insert(record);
+  try {
+    const { error } = await supabase.from("registrations").insert(record);
 
-  if (error) {
-    if (error.code === "23505") {
-      return NextResponse.json({
-        ok: true,
-        message: "Your institution is already registered with us. We will be in touch shortly.",
-      });
+    if (error) {
+      // 23505 = unique violation
+      if (error.code === "23505") {
+        return NextResponse.json({
+          ok: true,
+          message: "Your institution is already registered with us. We will be in touch shortly.",
+        });
+      }
+
+      console.warn("[register] Supabase error (falling back to local storage):", error.message);
+      // Fallback to local storage so submission is never lost
+      saveLocalRegistration(record);
+      return NextResponse.json({ ok: true });
     }
 
-    console.error("[register] insert failed:", error);
-    return NextResponse.json(
-      {
-        ok: false,
-        error: `We could not save your registration. Please email ${site.email} directly and we will assist you.`,
-      },
-      { status: 500 }
-    );
+    return NextResponse.json({ ok: true });
+  } catch (err) {
+    console.error("[register] Supabase call threw error, saving to local fallback:", err);
+    saveLocalRegistration(record);
+    return NextResponse.json({ ok: true });
   }
-
-  return NextResponse.json({ ok: true });
 }
