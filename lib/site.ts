@@ -11,7 +11,7 @@ export const site = {
   description:
     "A two-day, hands-on Edge AI workshop from Verikon covering model compression, on-device inference, and real hardware. Run on campus and live online.",
   url: "https://academy.verikon.ai",
-  email: "workshops@verikon.ai",
+  email: "verikonacademy@gmail.com",
   phone: "+91 00000 00000",
   location: "Gorakhpur & Agra, India, and online",
   social: {
