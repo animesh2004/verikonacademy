@@ -17,3 +17,5 @@ next-env.d.ts
 tsconfig.tsbuildinfo
 .vercel
 dev.log
+data/
+
