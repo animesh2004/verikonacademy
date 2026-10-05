@@ -54,7 +54,7 @@ function isRateLimited(ip: string): boolean {
 
   const now = Date.now();
   const windowMs = 10 * 60 * 1000;
-  const maxRequests = 10;
+  const maxRequests = 60; // 60 requests per 10 mins to accommodate shared campus/institution NAT IPs
 
   const entry = rateLimitMap.get(ip);
   if (!entry || now > entry.resetAt) {
