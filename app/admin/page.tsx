@@ -138,10 +138,6 @@ export default function AdminPage() {
               {loading ? "Authenticating..." : "Unlock Dashboard"}
             </button>
           </form>
-
-          <p className="mt-6 text-xs text-subtle">
-            Default passcode: <code className="text-muted">verikon2026</code>
-          </p>
         </div>
       </main>
     );
