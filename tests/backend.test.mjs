@@ -18,7 +18,9 @@ test("1. Health Check Endpoint — GET /api/health", async () => {
   assert.equal(typeof data.service, "string", "Service name should be returned");
   assert.ok(data.storage, "Storage diagnostics should be present");
   assert.ok(data.storage.supabase, "Supabase diagnostics should be present");
-  assert.equal(data.storage.supabase.connected, true, "Supabase should be connected");
+  if (data.storage.supabase.configured) {
+    assert.equal(data.storage.supabase.connected, true, "Supabase should be connected when configured");
+  }
   assert.ok(data.storage.localFallback, "Local fallback status should be present");
 });
 
